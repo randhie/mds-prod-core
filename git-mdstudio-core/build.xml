@@ -1,0 +1,46 @@
+<project name="mdstudio-core" default="main" basedir=".">
+	<property name="src.java" location="src/java"/>
+	<property name="build.dir" location="build"/>
+	<property name="ant.build" location="ant-build"/>
+	<property name="thirdparty.lib" location="../mdstudio-thirdpartylib"/>
+	
+	<path id="compile.lib">
+		<fileset dir="${thirdparty.lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+		<delete dir="${ant.build}}"/>
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${ant.build}"/>
+	</target>
+	
+	<target name="copyToBuild" depends="clean">
+		<copy todir="${build.dir}">
+			<fileset dir="${src.java}"/>
+		</copy>
+	</target>
+
+	<target name="compile" depends="clean,copyToBuild">
+		<javac classpathref="compile.lib" srcdir="${build.dir}" destdir="${ant.build}"/>
+		
+		<copy todir="${build.dir}">
+			<fileset dir="${ant.build}"/>
+		</copy>
+		
+		<delete>
+			<fileset dir="${build.dir}">
+				<include name="**/*.java"/>
+			</fileset>			
+		</delete>
+		
+		<delete dir="${ant.build}/com"/>
+	</target>
+		
+	<target name="main" depends="compile">
+		<jar destfile="${ant.build}/mdstudio-core.jar" basedir="${build.dir}"/>
+		<delete dir="${build.dir}"/>
+	</target>
+</project>

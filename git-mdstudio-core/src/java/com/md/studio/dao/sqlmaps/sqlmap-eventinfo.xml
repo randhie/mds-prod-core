@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="EventInfo">
+	<typeAlias alias="EventInfo" type="com.md.studio.domain.EventInfo"/>
+	
+	<resultMap class="EventInfo" id="eventinfo_rmap">
+		<result property="eventId"					column="EVENT_ID"/>
+		<result property="eventName"				column="EVENT_NAME"/>
+		<result property="description"				column="DESCRIPTION"/>
+		<result property="eventDate"				column="EVENT_DATE"/>
+		<result property="eventBannerLocation"		column="EVENT_BANNER_LOCATION"/>
+		<result property="createDate"				column="CREATE_DATE"/>
+		<result property="createdBy"				column="CREATED_BY"/>
+		<result property="updateDate"				column="UPDATE_DATE"/>
+		<result property="updatedBy"				column="UPDATED_BY"/>
+		<result property="eventWebUrl"				column="EVENT_WEB_URL"/>
+		<result property="eventArchiveUrl"			column="EVENT_ARCHIVE_URL"/>
+		<result property="eventFile"				column="EVENT_BANNER_FILE" jdbcType="BINARY"/>
+	</resultMap>
+	
+	<sql id="eventinfo_column">
+		EVENT_ID, EVENT_NAME, DESCRIPTION, EVENT_DATE,
+		EVENT_BANNER_LOCATION, CREATE_DATE, CREATED_BY,
+		UPDATE_DATE, UPDATED_BY, EVENT_WEB_URL,
+		EVENT_ARCHIVE_URL, EVENT_BANNER_FILE
+	</sql>
+	
+	
+	<insert id="insert" parameterClass="EventInfo">
+		<selectKey type="pre" keyProperty="eventId" resultClass="Long">
+			SELECT NEXTVAL('SEQ_EVENT_ID')
+		</selectKey>
+		
+		INSERT INTO EVENT_INFO (
+			<include refid="eventinfo_column"/>
+		)
+		VALUES (
+			#eventId#, #eventName#, #description#, #eventDate#, 
+			#eventBannerLocation#, #createDate#, #createdBy#, 
+			#updateDate#, #updatedBy#, #eventWebUrl#, #eventArchiveUrl#, #eventFile#
+		)
+	</insert>
+	
+	
+	<update id="update" parameterClass="EventInfo">
+		UPDATE EVENT_INFO
+		SET
+			EVENT_NAME = #eventName#,
+			DESCRIPTION = #description#,
+			EVENT_DATE = #eventDate#,
+			EVENT_BANNER_LOCATION = #eventBannerLocation#,
+			UPDATE_DATE = #updateDate#,
+			UPDATED_BY = #updatedBy#,
+			EVENT_WEB_URL = #eventWebUrl#,
+			EVENT_ARCHIVE_URL = #eventArchiveUrl#,
+			EVENT_BANNER_FILE = #eventFile#
+		WHERE EVENT_ID = #eventId#
+	</update>
+	
+	<select id="selectById" parameterClass="Long" resultMap="eventinfo_rmap">
+		SELECT
+			<include refid="eventinfo_column"/>
+		FROM EVENT_INFO
+		WHERE EVENT_ID = #value#
+	</select>
+	
+	<select id="selectByName" parameterClass="String" resultMap="eventinfo_rmap">
+		SELECT
+			<include refid="eventinfo_column"/>
+		FROM EVENT_INFO
+		WHERE EVENT_NAME = #value#
+	</select>
+	
+	<select id="selectAll" parameterClass="Map" resultMap="eventinfo_rmap">
+		SELECT
+			<include refid="eventinfo_column"/>
+		FROM EVENT_INFO
+		ORDER BY EVENT_ID ASC, EVENT_DATE DESC
+		LIMIT $limit$
+		OFFSET $offset$
+	</select>
+	
+	<select id="selectExpired" parameterClass="Map"  resultMap="eventinfo_rmap">
+		SELECT
+			<include refid="eventinfo_column"/>
+		FROM EVENT_INFO
+		WHERE EVENT_DATE <![CDATA[ < ]]> current_date
+		ORDER BY EVENT_DATE DESC
+		LIMIT $limit$
+		OFFSET $offset$
+	</select>
+	
+	<select id="selectValidEvents" resultMap="eventinfo_rmap">
+		SELECT
+			<include refid="eventinfo_column"/>
+		FROM EVENT_INFO
+		WHERE EVENT_DATE <![CDATA[ > ]]> current_date
+		ORDER BY EVENT_ID ASC, EVENT_DATE DESC
+		LIMIT $limit$
+		OFFSET $offset$
+	</select>
+	
+	<delete id="delete" parameterClass="EventInfo">
+		DELETE FROM EVENT_INFO
+		WHERE EVENT_ID = #eventId#
+	</delete>
+	
+	
+</sqlMap>
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Invites">
+	<typeAlias alias="Invites" type="com.md.studio.domain.Invites"/>
+	
+	<resultMap class="Invites" id="rmap_invites">
+		<result property="userId" 					column="USERID"/>
+		<result property="inviteeEmailAddress"		column="INVITEE_EMAIL_ADDRESS"/>
+		<result property="inviteeCode"				column="INVITEE_CODE"/>
+		<result property="inviteDate"				column="INVITE_DATE"/>
+	</resultMap>
+	
+	<sql id="invites_columns">
+		USERID, ENVITEE_EMAIL_ADDRESS, INVITEE_CODE, INVITE_DATE
+	</sql>
+	
+	<select id="selectAllInvites" resultMap="rmap_invites">
+		SELECT
+			<include refid="invites_columns"/>
+		FROM SITE_USER_INVITES
+		ORDER BY INVITE_DATE DESC, USERID ASC
+	</select>
+	
+	
+	<select id="selectById" parameterClass="String" resultMap="rmap_invites">
+		SELECT
+			<include refid="invites_columns"/>
+		FROM SITE_USER_INVITES
+		WHERE USERID = #value#
+		ORDER BY INVITE_DATE DESC, USERID ASC
+	</select>
+	
+	<select id="selectByEmail" parameterClass="String" resultMap="rmap_invites">
+		SELECT
+			<include refid="invites_columns"/>
+		FROM SITE_USER_INVITES
+		WHERE INVITEE_EMAIL_ADDRESS = #value#
+		ORDER BY INVITE_DATE DESC, INVITEE_EMAIL_ADDRESS ASC
+	</select>
+
+	<select id="select" parameterClass="Map" resultMap="rmap_invites">
+		SELECT
+			<include refid="invites_columns"/>
+		FROM SITE_USER_INVITES
+		WHERE 
+			USERID = #userId#
+		AND INVITEE_EMAIL_ADDRESS = #inviteeEmailAddress#
+		ORDER BY INVITE_DATE DESC
+	</select>
+	
+	<select id="selectByInviteeCode" parameterClass="String" resultMap="rmap_invites">
+		SELECT
+			<include refid="invites_columns"/>
+		FROM SITE_USER_INVITES 
+		WHERE INVITEE_CODE = #value#
+	</select>
+	
+	
+	<insert id="insert" parameterClass="Invites">
+		INSERT INTO SITE_USER_INVITES (
+			<include refid="invites_columns"/>
+		)
+		VALUES(
+			#userId#, #inviteeEmailAddress#, #inviteeCode#, #inviteDate#
+		)
+	</insert>	
+	
+</sqlMap>

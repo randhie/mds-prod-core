@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="EmailTemplate">
+	<typeAlias alias="EmailTemplate" type="com.md.studio.domain.EmailTemplate"/>
+
+	<resultMap class="EmailTemplate" id="rmap_emailtemplate">
+		<result property="templateCode" 		column="TEMPLATE_CODE"/>
+		<result property="descriptions"			column="DESCRIPTIONS"/>
+		<result property="createdBy"			column="CREATED_BY"/>
+		<result property="createdDate"			column="CREATED_DATE"/>
+		<result property="templateHtml"			column="TEMPLATE_HTML"/>
+		<result property="emailSubject"			column="EMAIL_SUBJECT"/>
+		<result property="emailFrom"			column="EMAIL_FROM"/>
+		<result property="emailFromName"		column="EMAIL_FROM_NAME"/>
+	</resultMap>
+	
+	<sql id="emailtemplate_columns">
+		TEMPLATE_CODE, DESCRIPTIONS, CREATED_BY, CREATED_DATE, TEMPLATE_HTML,
+		EMAIL_SUBJECT, EMAIL_FROM, EMAIL_FROM_NAME	
+	</sql>
+	
+	
+	<insert id="insert" parameterClass="EmailTemplate">
+		INSERT INTO EMAILTEMPLATE (
+			<include refid="emailtemplate_columns"/>
+		) VALUES (
+			#templateCode#, #descriptions#, #createdBy#, #createdDate#, #templateHtml#,
+			#emailSubject#, #emailFrom#, #emailFromName#
+		)
+	</insert>
+	
+	
+	<delete id="delete" parameterClass="EmailTemplate">
+		DELETE FROM EMAILTEMPLATE
+		WHERE TEMPLATE_CODE = #templateCode#
+	</delete>
+	
+	<select id="selectByCode" parameterClass="String" resultMap="rmap_emailtemplate">
+		SELECT 
+			<include refid="emailtemplate_columns"/>
+		FROM EMAILTEMPLATE
+		WHERE TEMPLATE_CODE = #value#	
+	</select>
+	
+	<select id="selectAll" resultMap="rmap_emailtemplate">
+		SELECT 
+			<include refid="emailtemplate_columns"/>
+		FROM EMAILTEMPLATE
+		ORDER BY TEMPLATE_CODE
+	</select>
+
+</sqlMap>

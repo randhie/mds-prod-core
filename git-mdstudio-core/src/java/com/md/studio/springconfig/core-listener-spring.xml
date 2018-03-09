@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="photoUtilListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.photoUtilListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.photoUtilListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPhotos}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="photoUtilSvc"/>
+				<property name="defaultListenerMethod" value="processPhotos"/>
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<bean id="photoUtilListenerCleanPortfolio" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.photoUtilListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.photoUtilListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPortfolio}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="photoUtilSvc"/>
+				<property name="defaultListenerMethod" value="processPortfolio"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="photoUtilListenerCleanPreviewPhotos" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.photoUtilListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.photoUtilListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPreviewPhotos}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="photoUtilSvc"/>
+				<property name="defaultListenerMethod" value="processPreviewPhotos"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="photoUtilListenerCleanPhotoArchives" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.photoUtilListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.photoUtilListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPhotoArchives}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="photoUtilSvc"/>
+				<property name="defaultListenerMethod" value="processPhotoArchives"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="processPhotoUploadListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.photoUtilListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.photoUtilListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPhotoUpload}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="photoUtilSvc"/>
+				<property name="defaultListenerMethod" value="processUploadPhoto"/>
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<bean id="emailSenderListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.emailSenderSvcListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.emailSenderSvcListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.emailSenderSvcListener.destinationQueue:mdsnapshots.emailout}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="emailSenderSvc"/>
+				<property name="defaultListenerMethod" value="processEmail"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="eventHandlerListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.eventHandlerListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.eventHandlerListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.eventHandlerListener.destinationQueue:siteUser.event}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="siteUserEventMonitor"/>
+				<property name="defaultListenerMethod" value="handleSiteUserEvent"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="siteUserActivityLogProcessListener" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="jmsConnectionFactory"/>
+		<property name="concurrentConsumers" value="${mdstudio.eventHandlerListener.concurrentConsumers:1}"/>
+		<property name="maxConcurrentConsumers" value="${mdstudio.siteUserActivityLogListener.maxConcurrentConsumers: 5}"/>
+		<property name="destinationName" value="${mdstudio.siteUserActivityLogListener.destinationQueue:processLog}"/>
+		<property name="messageListener">
+			<bean class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+				<constructor-arg ref="siteUserActivityLogSvc"/>
+				<property name="defaultListenerMethod" value="processActivityLog"/>
+			</bean>
+		</property>
+	</bean>
+
+	
+</beans>

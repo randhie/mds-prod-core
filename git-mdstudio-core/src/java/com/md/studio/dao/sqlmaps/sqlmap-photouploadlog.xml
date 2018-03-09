@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="PhotoUploadLog">
+	<typeAlias alias="PhotoUploadLog" type="com.md.studio.domain.PhotoUploadLog"/>
+
+	<resultMap class="PhotoUploadLog" id="rmap_photouploadlog">
+		<result property="uploadId"			column="UPLOAD_ID"/>
+		<result property="userId"			column="USERID"/>
+		<result property="baseFolder"		column="BASE_FOLDER"/>
+		<result property="parentFolder"		column="PARENT_FOLDER"/>
+		<result property="childFolder"		column="CHILD_FOLDER"/>
+		<result property="fileName"			column="FILENAME"/>
+		<result property="uploadDate"		column="UPLOADED_DATE"/>
+		<result property="photoUploadDirId"	column="PHOTOUPLOAD_DIRECTORY_ID"/>
+	</resultMap>
+	
+	<sql id="photouploadlog_columns">
+		UPLOAD_ID, USERID, BASE_FOLDER, PARENT_FOLDER,
+		CHILD_FOLDER, FILENAME, UPLOADED_DATE,
+		PHOTOUPLOAD_DIRECTORY_ID
+	</sql>
+	
+	
+	<insert id="insert" parameterClass="PhotoUploadLog">
+		<selectKey type="pre" keyProperty="uploadId" resultClass="Long">
+			SELECT NEXTVAL('SEQ_UPLOAD_ID')
+		</selectKey>
+		
+		INSERT INTO PHOTO_UPLOAD_LOGS (
+			<include refid="photouploadlog_columns"/>
+		)
+		VALUES (
+			#uploadId#, #userId#, #baseFolder#, #parentFolder#, #childFolder# ,
+			#fileName# ,#uploadDate#, #photoUploadDirId#
+		)
+	</insert>
+	
+		
+	
+</sqlMap>

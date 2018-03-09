@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="EventRequest">
+	<typeAlias alias="EventRequest" type="com.md.studio.domain.EventRequest"/>
+
+	<resultMap class="EventRequest" id="eventrequest_rmap">
+		<result property="requestId"		column="REQUEST_ID"/>
+		<result property="emailAddress"		column="EMAIL_ADDRESS"/>
+		<result property="fullName"			column="FULL_NAME"/>
+		<result property="contactNumber"	column="CONTACT_NUMBER"/>
+		<result property="desiredDate"		column="DESIRED_DATE"/>
+		<result property="eventLocation"	column="EVENT_LOCATION"/>
+		<result property="eventBudget"		column="EVENT_BUDGET"/>
+		<result property="message"			column="NOTE_MESSAGE"/>
+		<result property="notes"			column="NOTES"/>
+		<result property="createDate"		column="CREATE_DATE"/>
+		<result property="hasContacted"		column="HAS_CONTACTED"/>
+		<result property="hasAccomplished"	column="HAS_ACCOMPLISHED"/>
+		<result property="contactedDate"	column="CONTACTED_DATE"/>
+		<result property="accomplishedDate"	column="ACCOMPLISHED_DATE"/>
+		<result property="hasCancelled"		column="HAS_CANCELLED"/>
+		<result property="cancelledDate"	column="CANCELLED_DATE"/>
+	</resultMap>
+	
+	<sql id="eventrequest_columns">
+		REQUEST_ID, EMAIL_ADDRESS, FULL_NAME,
+		CONTACT_NUMBER, DESIRED_DATE, EVENT_LOCATION,
+		EVENT_BUDGET, NOTE_MESSAGE, NOTES, CREATE_DATE,
+		HAS_CONTACTED, HAS_ACCOMPLISHED, CONTACTED_DATE,
+		ACCOMPLISHED_DATE, HAS_CANCELLED, CANCELLED_DATE
+	</sql>
+	
+	<insert id="insert" parameterClass="EventRequest">
+		<selectKey type="pre" keyProperty="requestId" resultClass="Long">
+			SELECT NEXTVAL('SEQ_REQUEST_ID')
+		</selectKey>
+		
+		INSERT INTO EVENT_REQUEST (
+			<include refid="eventrequest_columns"/>
+		)
+		VALUES (
+			#requestId#, #emailAddress#, #fullName#, #contactNumber#, 
+			#desiredDate#, #eventLocation#, #eventBudget#, 
+			#message#, #notes#, #createDate#, 
+			#hasContacted#, #hasAccomplished#, #contactedDate#,
+			#accomplishedDate#, #hasCancelled#, #cancelledDate#
+		)
+	</insert>
+	
+	<update id="updateHasContacted" parameterClass="EventRequest">
+		UPDATE EVENT_REQUEST 
+		SET 
+			HAS_CONTACTED = #hasContacted#,
+			CONTACTED_DATE = #contactedDate#
+		WHERE REQUEST_ID = #requestId#
+	</update>
+	
+	<update id="updateHasAccomplished" parameterClass="EventRequest">
+		UPDATE EVENT_REQUEST 
+		SET 
+			HAS_ACCOMPLISHED = #hasAccomplished#,
+			ACCOMPLISHED_DATE = #accomplishedDate#
+		WHERE REQUEST_ID = #requestId#
+	</update>
+	
+	<update id="update" parameterClass="EventRequest">
+		UPDATE EVENT_REQUEST
+		SET
+			EMAIL_ADDRESS = #emailAddress#,
+			FULL_NAME = #fullName#,
+			CONTACT_NUMBER = #contactNumber#,
+			DESIRED_DATE = #desiredDate#,
+			EVENT_LOCATION = #eventLocation#,
+			EVENT_BUDGET = #eventBudget#,
+			NOTE_MESSAGE = #message#,
+			NOTES = #notes#
+		WHERE 
+			REQUEST_ID = #requestId#
+	</update>
+	
+	
+	<update id="updateReqCancelled" parameterClass="EventRequest">
+		UPDATE EVENT_REQUEST
+		SET
+			HAS_CANCELLED = #hasCancelled#,
+			CANCELLED_DATE = #cancelledDate#
+		WHERE REQUEST_ID = #requestId#
+	</update>
+	
+	
+	<select id="selectAll" resultMap="eventrequest_rmap">
+		SELECT
+			<include refid="eventrequest_columns"/>
+		FROM EVENT_REQUEST
+		ORDER BY CREATED_DATE DESC
+	</select>
+	
+	
+	<select id="selectById" parameterClass="Long" resultMap="eventrequest_rmap">
+		SELECT 
+			<include refid="eventrequest_columns"/>
+		FROM EVENT_REQUEST
+		REQUEST_ID = #requestId#
+	</select>
+	
+	<select id="selectByEmail" parameterClass="String" resultMap="eventrequest_rmap">
+		SELECT 
+			<include refid="eventrequest_columns"/>
+		FROM EVENT_REQUEST
+		WHERE 
+			NOTE_ID = #emailAddress#
+		ORDER BY 
+			CREATED_DATE DESC,
+			HAS_CONTACTED DESC,
+			HAS_ACCOMPLISHED DESC
+	</select>
+	
+	<select id="selectHasContacted" parameterClass="java.lang.Boolean" resultMap="eventrequest_rmap">
+		SELECT 
+			<include refid="eventrequest_columns"/>
+		FROM EVENT_REQUEST
+		WHERE 
+			HAS_CONTACTED = #value#
+		ORDER BY
+			CREATED_DATE DESC,
+			CONTACTED_DATE DESC
+	</select>
+	
+	<select id="selectHasAccomplished" parameterClass="java.lang.Boolean" resultMap="eventrequest_rmap">
+		SELECT 
+			<include refid="eventrequest_columns"/>
+		FROM EVENT_REQUEST
+		WHERE 
+			HAS_ACCOMPLISHED = #value#
+		ORDER BY
+			CREATED_DATE DESC,
+			ACCOMPLISHED_DATE DESC
+	</select>
+	
+</sqlMap>

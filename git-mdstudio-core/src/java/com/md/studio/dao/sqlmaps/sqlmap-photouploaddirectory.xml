@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="PhotoUploadDirectory">
+	<typeAlias alias="PhotoUploadDirectory" type="com.md.studio.domain.PhotoUploadDirectory"/>
+
+	<resultMap class="PhotoUploadDirectory" id="rmap_photouploadDirectory">
+		<result property="uploadId"		column="UPLOAD_ID"/>
+		<result property="baseFolder"	column="BASE_FOLDER"/>
+		<result property="parentFolder"	column="PARENT_FOLDER"/>
+		<result property="childFolder"	column="CHILD_FOLDER"/>
+		<result property="createdDate"	column="CREATED_DATE"/>
+		<result property="createdBy"	column="CREATED_BY"/>
+		<result property="stillValid"	column="STILL_VALID" nullValue="true"/>
+		<result property="validFrom"	column="VALID_FROM"/>
+		<result property="validTo"		column="VALID_TO"/>
+	</resultMap>
+	
+	
+	<sql id="photouploaddirectory_columns">
+		UPLOAD_ID, BASE_FOLDER, PARENT_FOLDER, CHILD_FOLDER,
+		CREATED_DATE, CREATED_BY, STILL_VALID, VALID_FROM,
+		VALID_TO
+	</sql>
+	
+	<insert id="insert" parameterClass="photoUploadDirectory">
+		<selectKey type="pre" keyProperty="uploadId" resultClass="Long">
+			SELECT NEXTVAL('SEQ_PHOTOUPLOAD')
+		</selectKey>
+	
+		INSERT INTO photoupload_directory (
+			<include refid="photouploaddirectory_columns"/>
+		)
+		values (
+			#uploadId#, #baseFolder#, #parentFolder#, #childFolder#, 
+			#createdDate#, #createdBy#, #stillValid#, #validFrom#, #validTo#
+		)
+	</insert>
+	
+	<update id="update" parameterClass="photoUploadDirectory">
+		UPDATE photoupload_directory
+		SET
+			BASE_FOLDER = #baseFolder#,
+			PARENT_FOLDER = #parentFolder#,
+			CHILD_FOLDER = #childFolder#,
+			STILL_VALID = #stillValid#,
+			VALID_FROM = #validFrom#,
+			VALID_TO = #validTo#
+		WHERE UPLOAD_ID = #uploadId#
+	</update>
+	
+	<update id="updateValidStatus" parameterClass="photoUploadDirectory">
+		UPDATE photoupload_directory
+		SET
+			STILL_VALID = #stillValid#
+		WHERE UPLOAD_ID = #uploadId#
+	</update>
+	
+	<delete id="delete" parameterClass="photoUploadDirectory">
+		DELETE FROM photoupload_directory
+		WHERE UPLOAD_ID = #uploadId#
+	</delete>
+	
+	
+	<select id="selectById" parameterClass="Long" resultMap="rmap_photouploadDirectory">
+		SELECT 
+			<include refid="photouploaddirectory_columns"/>
+		FROM photoupload_directory
+		WHERE UPLOAD_ID = #value#
+	</select>
+	
+	<select id="selectAll" resultMap="rmap_photouploadDirectory">
+		SELECT 
+			<include refid="photouploaddirectory_columns"/>
+		FROM photoupload_directory
+		ORDER BY CREATED_DATE DESC
+	</select>
+	
+	
+	<select id="selectAllValid" resultMap="rmap_photouploadDirectory">
+		SELECT 
+			<include refid="photouploaddirectory_columns"/>
+		FROM photoupload_directory
+		WHERE STILL_VALID = 'true'
+		ORDER BY 
+			BASE_FOLDER DESC, 
+			PARENT_FOLDER DESC,
+			CREATED_DATE DESC
+	</select>
+	
+	<select id="selectAllInvalid" resultMap="rmap_photouploadDirectory">
+		SELECT 
+			<include refid="photouploaddirectory_columns"/>
+		FROM photoupload_directory
+		WHERE STILL_VALID = 'false'
+		ORDER BY 
+			BASE_FOLDER DESC, 
+			PARENT_FOLDER DESC,
+			CREATED_DATE DESC
+	</select>
+	
+</sqlMap>

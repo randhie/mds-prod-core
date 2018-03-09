@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="SiteUserActivityLog">
+	<typeAlias alias="SiteUserActivityLog" type="com.md.studio.domain.SiteUserActivityLog"/>
+	
+	<resultMap class="SiteUserActivityLog" id="rmap_siteuser_activitylog">
+		<result property="logId" 	column="LOG_ID"/>
+		<result property="dateAccess"	column="DATE_ACCESS"/>
+		<result property="ipAddress"		column="IP_ADDRESS"/>
+		<result property="browserInfo"		column="BROWSER_INFO"/>
+		<result property="urlAccess"		column="URL_ACCESS"/>
+		<result property="category"			column="CATEGORY"/>
+		<result property="directory"		column="DIRECTORY"/>
+		<result property="fileName"			column="FILENAME"/>
+		<result property="categoryId"		column="CATEGORY_ID"/>
+		<result property="photoId"			column="PHOTO_ID"/>
+		<result property="whoIsRawInfo"		column="WHOIS_RAWINFO"/>
+	</resultMap>
+	
+	<sql id="siteuser_activitylog_column">
+		LOG_ID, DATE_ACCESS, IP_ADDRESS, BROWSER_INFO, URL_ACCESS, CATEGORY, DIRECTORY, FILENAME, CATEGORY_ID, PHOTO_ID, WHOIS_RAWINFO
+	</sql>
+
+	<insert id="insert" parameterClass="SiteUserActivityLog">
+		<selectKey keyProperty="logId" resultClass="long" type="pre">
+			SELECT NEXTVAL('SEQ_SITEUSER_ACTIVITYLOG')
+		</selectKey>
+		
+		INSERT INTO SITEUSER_ACTIVITYLOG (
+			<include refid="siteuser_activitylog_column"/>
+		)
+		VALUES (
+			#logId#, #dateAccess#, #ipAddress#, #browserInfo#, #urlAccess#, #category#, #directory#, #fileName#, #categoryId#, #photoId#, #whoIsRawInfo#
+		)
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="userTestimonialDao" class="com.md.studio.dao.impl.UserTestimonialDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="siteUserDao" class="com.md.studio.dao.impl.SiteUserDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+
+	<bean id="emailTemplateDao" class="com.md.studio.dao.impl.EmailTemplateDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="invitesDao" class="com.md.studio.dao.impl.InvitesDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="referenceDataDao" class="com.md.studio.dao.impl.ReferenceDataDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>	
+	</bean>
+	
+	<bean id="photoUploadDirDao" class="com.md.studio.dao.impl.PhotoUploadDirDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="photoUploadLogDao" class="com.md.studio.dao.impl.PhotoUploadLogDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="emailLogDao"	class="com.md.studio.dao.impl.EmailLogDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="eventRequestDao"	class="com.md.studio.dao.impl.EventRequestDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="eventInfoDao" class="com.md.studio.dao.impl.EventInfoDaoImpl_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="photoGathererDao" class="com.md.studio.dao.impl.PhotoGathererDaoImp_Ibatis" >
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+	
+	<bean id="siteUserActivityLogDao" class="com.md.studio.dao.impl.SiteUserActivityLogDao_Ibatis">
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>
+</beans>

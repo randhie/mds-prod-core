@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-config-2.dtd" >
+
+
+<sqlMapConfig>
+	<settings
+		cacheModelsEnabled="true"
+		enhancementEnabled="true"
+		useStatementNamespaces="true"
+		maxSessions="160"
+		maxTransactions="150"
+		maxRequests="512"/>
+
+	<typeHandler javaType="com.md.studio.domain.enums.SiteUserStatus" 
+		callback="com.md.studio.dao.impl.typehandler.SiteUserStatusTypeHandlerCallback"/>
+	
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-testimonials.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-siteuser.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-emailtemplate.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-referencedata.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-invites.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-photouploaddirectory.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-photouploadlog.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-email_log.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-eventrequest.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-eventinfo.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-photoinfo.xml"/>
+	<sqlMap resource="com/md/studio/dao/sqlmaps/sqlmap-siteuseractivitylog.xml"/>
+</sqlMapConfig>

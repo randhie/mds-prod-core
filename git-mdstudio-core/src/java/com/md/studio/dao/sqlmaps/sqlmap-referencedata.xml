@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="ReferenceData">
+	<typeAlias alias="ReferenceData" type="com.md.studio.domain.ReferenceData"/>
+	<resultMap class="ReferenceData" id="rmap_referencedata">
+		<result property="refType"		column="REF_TYPE"/>
+		<result property="refCode"		column="REF_CODE"/>
+		<result property="refValue"		column="REF_VALUE"/>
+	</resultMap>
+	
+	<sql id="referencedata_columns">
+		REF_TYPE, REF_CODE, REF_VALUE
+	</sql>
+	
+	
+	<insert id="insert" parameterClass="ReferenceData">
+		INSERT INTO REFERENCE_DATA (
+			<include refid="referencedata_columns"/>
+		)
+		VALUES (
+			#refType#, #refCode#, #refValue#
+		)
+	</insert>
+
+	<select id="selectByType" parameterClass="String" resultMap="rmap_referencedata">
+		SELECT 
+			<include refid="referencedata_columns"/>
+		FROM REFERENCE_DATA
+		WHERE REF_TYPE = #value#
+	</select>
+	
+	<select id="selectByTypeAndCode" parameterClass="Map" resultMap="rmap_referencedata">
+		SELECT 
+			<include refid="referencedata_columns"/>
+		FROM REFERENCE_DATA
+		WHERE 
+			REF_TYPE = #refType#
+		AND REF_CODE = #refCode#
+	</select>
+	
+	<select id="selectAll" resultMap="rmap_referencedata">
+		SELECT 
+			<include refid="referencedata_columns"/>
+		FROM REFERENCE_DATA
+	</select>
+	
+	
+	<update id="update" parameterClass="ReferenceData">
+		UPDATE REFERENCE_DATA
+		SET 
+			REF_VALUE = #refValue#
+		WHERE 
+			REF_TYPE = #refType#
+		AND REF_CODE = #refCode#
+	</update>
+	
+	<delete id="delete" parameterClass="ReferenceData">
+		DELETE FROM REFERENCE_DATA
+		WHERE
+			REF_TYPE = #refType#
+		AND
+			REF_CODE = #refCode#
+	</delete>
+
+
+</sqlMap>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="SiteUser">
+	<typeAlias alias="SiteUser" type="com.md.studio.domain.SiteUser"/>
+	
+	<resultMap class="SiteUser" id="rmap_siteuser">
+		<result property="userId"			column="USERID"/>
+		<result property="emailAddress"		column="EMAIL_ADDRESS"/>
+		<result property="firstName"		column="FIRST_NAME"/>
+		<result property="lastName"			column="LAST_NAME"/>
+		<result property="passcode"			column="PASSCODE"/>
+		<result property="signupDate"		column="SIGNUP_DATE"/>
+		<result property="signupIpAddress"	column="SIGNUP_IPADDRESS"/>
+		<result property="lastLogin"		column="LAST_LOGIN"/>
+		<result property="loginIpAddress"	column="LOGIN_IPADDRESS"/>
+		<result property="dateActivated"	column="DATE_ACTIVATED"/>
+		<result property="userStatus"		column="USER_STATUS"/>
+		<result property="activationCode"	column="ACTIVATION_CODE"/>
+		<result property="authAlbums"		column="AUTHORIZED_ALBUMS"/>
+		<result property="hasInvited"		column="IS_INVITED"/>
+		<result property="admin"			column="IS_ADMIN"/>
+		<result property="authUploads"		column="AUTH_UPLOADS"/>
+		<result property="signupBrowser"	column="SIGNUP_BROWSER"/>
+		<result property="lastLoginBrowser"	column="LAST_LOGIN_BROWSER"/>
+		
+	</resultMap>
+	
+	<sql id="siteuser_columns">
+		USERID, EMAIL_ADDRESS, FIRST_NAME, LAST_NAME, PASSCODE, SIGNUP_DATE, SIGNUP_IPADDRESS, 
+		LAST_LOGIN, LOGIN_IPADDRESS, DATE_ACTIVATED, USER_STATUS, ACTIVATION_CODE,
+		AUTHORIZED_ALBUMS, IS_INVITED, IS_ADMIN, AUTH_UPLOADS, SIGNUP_BROWSER, LAST_LOGIN_BROWSER
+	</sql>
+	
+	<insert id="insert" parameterClass="SiteUser">
+		INSERT INTO SITE_USER (
+			<include refid="siteuser_columns"/>
+		)
+		VALUES (
+			#userId#, #emailAddress#, #firstName#, #lastName#, CRYPT(#passcode#, GEN_SALT('MD5')), #signupDate#, 
+			#signupIpAddress#, #lastLogin#, #loginIpAddress#, #dateActivated#, 
+			#userStatus#, #activationCode#, #authAlbums#, #hasInvited#, #admin#, #authUploads#,
+			#signupBrowser#, #lastLoginBrowser#
+		)
+	</insert>
+	
+	
+	<update id="update" parameterClass="SiteUser">
+		UPDATE SITE_USER 
+		SET
+			EMAIL_ADDRESS = #emailAddress#,
+			FIRST_NAME = #firstName#,
+			LAST_NAME = #lastName#,
+			DATE_ACTIVATED = #dateActivated#,
+			USER_STATUS = #userStatus#,
+			ACTIVATION_CODE = #activationCode#,
+			AUTHORIZED_ALBUMS = #authAlbums#,
+			IS_INVITED = #hasInvited#,
+			IS_ADMIN = #admin#,
+			AUTH_UPLOADS = #authUploads#
+		WHERE 
+			USERID = #userId#
+	</update>
+	
+	<update id="updateUserStatus" parameterClass="SiteUser">
+		UPDATE SITE_USER
+		SET 
+			USER_STATUS = #userStatus#
+		WHERE 
+			USERID = #userId#
+	</update>
+	
+	<update id="updatePasscode" parameterClass="SiteUser">
+		UPDATE SITE_USER
+		SET
+			PASSCODE = CRYPT(#passcode#, GEN_SALT('MD5'))
+		WHERE 
+			USERID = #userId#
+	</update>
+	
+	<update id="updateLastLogin" parameterClass="SiteUser">
+		UPDATE SITE_USER
+		SET 
+			LAST_LOGIN = #lastLogin#, 
+			LOGIN_IPADDRESS = #loginIpAddress#,
+			LAST_LOGIN_BROWSER = #lastLoginBrowser#
+		WHERE USERID = #userId#
+	</update>
+	
+	<update id="updateAuthUpload" parameterClass="SiteUser">
+		UPDATE SITE_USER
+		SET	AUTH_UPLOADS = #authUploads#
+		WHERE USERID = #userId#
+	</update>
+	
+	
+	<select id="selectPasscode" parameterClass="Map" resultClass="String">
+		SELECT CRYPT(#passcode#, #encPassCode#) 
+	</select>
+	
+	<select id="selectByEmail" parameterClass="String" resultMap="rmap_siteuser">
+		SELECT 
+			<include refid="siteuser_columns"/>
+		FROM SITE_USER
+		WHERE EMAIL_ADDRESS = #value#
+	</select>
+	
+	<select id="selectById" parameterClass="String" resultMap="rmap_siteuser">
+		SELECT 
+			<include refid="siteuser_columns"/>
+		FROM SITE_USER
+		WHERE USERID = #value#
+	</select>
+
+	<select id="selectByActivationCode" parameterClass="String" resultMap="rmap_siteuser">
+		SELECT
+			<include refid="siteuser_columns"/>
+		FROM SITE_USER
+		WHERE ACTIVATION_CODE = #value# 		
+	</select>
+	
+	<select id="selectAll" resultMap="rmap_siteuser">
+		SELECT 
+			<include refid="siteuser_columns"/>
+		FROM SITE_USER
+		ORDER BY FIRST_NAME ASC, LAST_NAME ASC
+	</select>
+	
+</sqlMap>

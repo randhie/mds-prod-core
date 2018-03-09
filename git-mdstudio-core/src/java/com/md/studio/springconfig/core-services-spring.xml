@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+		
+	<context:property-placeholder system-properties-mode="OVERRIDE"/>
+	
+	<bean id="photoUtilSvc" class="com.md.studio.service.impl.PhotoUtilSvcImpl" init-method="initPath">
+		<property name="tempPhotoLocation" value="${mdstudio.photoUtilSvc.tempPhotoLocation:/Users/rordinario/Desktop/tempfolder}"/>
+		<property name="permPhotoLocation" value="${mdstudio.photoUtilSvc.permPhotoLocation:/Users/rordinario/Desktop/permfolder}"/>
+		<property name="tempSlideShowLocation" value="${mdstudio.tempSlideShowLocation:/Users/rordinario/Desktop/tempSlideFolder}"/>
+		<property name="permSlideShowLocation" value="${mdstudio.permSlideShowLocation:/Users/rordinario/Desktop/permSlideFolder}"/>
+		<property name="permUserPhotoUploadLocation" value="${mdstudio.permUserPhotoUploadLocation:/Users/rordinario/Desktop/permSlideFolder}"/>
+		<property name="portfolioLocation" value="${mdstudio.photoInfoSvc.permPortfolioLocation:/Users/rordinario/Desktop/mdportfoliofolder}"/>
+		<property name="previewLocation" value="${mdstudio.photoInfoSvc.permPreviewLocation:/Users/rordinario/Desktop/previewfolder}"/>
+		<property name="permCalendarPhotoLocation" value="${mdstudio.photoUtilSvc.permCalendarPhotoLocation:/Users/rordinario/Pictures/mdcalendarfolder}"/>
+		<property name="imageSize" value="${mdstudio.studio.imageSize:1920}"/>
+		<property name="jmsMessageSender" ref="jmsMessageSender"/>
+		<property name="destinationQueue" value="${mdstudio.photoUtilSvc.destinationQueue:mdstudio.processPhotos}"/>
+		<property name="destinationQueueUpload" value="${mdstudio.photoUtilSvc.destinationQueueUpload:mdstudio.processPhotoUpload}"/>
+		<property name="refreshManagerSvc" ref="refreshManagerSvc"/>
+		<property name="photoUploadDirSvc" ref="photoUploadDirSvc"/>
+		<property name="photoUploadLogDao" ref="photoUploadLogDao"/>
+		<property name="thumbnailNeeded" value="${mdstudio.photoUtilSvc.thumbnailneeded:true}"/>
+		<property name="thumbnailSize" value="${mdstudio.photoUtilSvc.thumbnailsize:600}"/>
+		<property name="photoGathererSvc" ref="photoGathererSvc"/>
+		<property name="destinationQueueCleanupPortfolio" value="${mdstudio.photoUtilSvc.destinationQueueCleanupPortfolio:mdstudio.processPortfolio}"/> 
+		<property name="destinationQueueCleanupPreviewPhoto" value="${mdstudio.photoUtilSvc.destinationQueueCleanupPortfolio:mdstudio.processPreviewPhotos}"/>
+		<property name="destinationQueueCleanupPhotoArchive" value="${mdstudio.photoUtilSvc.destinationQueueCleanupPhotoArchive:mdstudio.processPhotoArchives}"/>
+		<property name="scannedAllowed" value="${scanned.allowed:false}"/>
+		<property name="shrinkNeeded" value="${mdstudio.photoUtilSvc.shrinkNeeded:true}"/>
+	</bean>
+	
+	<bean id="photoUploadDirSvc" class="com.md.studio.service.impl.PhotoUploadDirSvcImpl">
+		<property name="photoUploadDirDao" ref="photoUploadDirDao"/>
+	</bean>
+	
+	<bean id="photoInfoNewSvc" class="com.md.studio.service.impl.PhotoInfoNewSvcImpl" init-method="init">
+		<property name="permSlideShowLocation" value="${mdstudio.photoInfoSvc.permSlideShowLocation:/Users/rordinario/Desktop/permSlideFolder}"/>
+		<property name="permPhotoLocation" value="${mdstudio.photoInfoSvc.permPhotoLocation:/Users/rordinario/Desktop/permfolder}"/>
+		<property name="permPreviewLocation" value="${mdstudio.photoInfoSvc.permPreviewLocation:/Users/rordinario/Desktop/previewfolder}"/>
+		<property name="permSpecialPhotoLocation" value="${mdstudio.photoInfoSvc.permSpecialPhotoLocation:/Users/rordinario/Desktop/permSpecialfolder}"/>
+		<property name="permPortfolio" value="${mdstudio.photoInfoSvc.permPortfolioLocation:/Users/rordinario/Desktop/permPortfolioFolder}"/>
+	</bean>
+	
+	<bean id="refreshManagerSvc" class="com.md.studio.service.impl.RefreshManagerSvcImpl"></bean>
+	
+	<bean id="userTestimonialSvc" class="com.md.studio.service.impl.UserTestimonialSvcImpl">
+		<property name="userTestimonialDao" ref="userTestimonialDao"/>
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+	</bean>
+	
+	<bean id="emailSenderSvc" class="com.md.studio.service.impl.EmailSenderSvcImpl">	
+		<property name="tempFolder" value="${mdsnapshots.multipartUploadTempDir:/servers/jboss-5.1.0.GA/server/default/tmp}"/>
+		<property name="async" value="${mdsnapshots.emailSenderSvc.email.async:true}"/>
+		<property name="emailQueueName" value="${mdsnapshots.emailSenderSvc.emailQueueName:mdsnapshots.emailout}"/>
+		<property name="jmsMessageSender" ref="jmsMessageSender"/>
+		<property name="javaMailSender" ref="javaMailSender"/>	
+ 		<property name="javaMailJetSender" ref="mailJetSenderSvc"/>
+ 		<property name="javaInternalMailSender" ref="mailInternalMailSender"/>
+		<property name="emailTemplateSvc" ref="emailTemplateSvc"/>
+		<property name="url" value="${mdsnapshots.emailSenderSvc.url:http://mdsnapshots.com}"/>
+		<property name="emailLogDao"	ref="emailLogDao"/>
+	</bean> 
+	
+	<bean id="siteUserInfoSvc" class="com.md.studio.service.impl.SiteUserInfoSvcImpl">
+		<property name="siteUserDao" ref="siteUserDao"/>
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+		<property name="passCodeEmailTemplate" value="${mdsnapshots.siteUserInfoSvc.passcode.reset.templateName:password-reset.vm}"/>
+	</bean>
+	
+	<bean id="signupUserSvc" class="com.md.studio.service.impl.SignupUserSvcImpl">
+		<property name="siteUserInfoSvc" ref="siteUserInfoSvc"/>
+		<property name="invitesDao" ref="invitesDao"/>
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+		<property name="templateName" value="${mdsnapshots.signupUserSvc.activationTemplate:activate.vm}"/>
+		<property name="url" value="${mdsnapshots.signupUserSvc.url:http://mdsnapshots.com/activate.html}"/>
+		<property name="supportEmail" value="${mdsnapshots.signupSvc.supportEmail:mdsupport@mdsnapshots.com}"/>
+	</bean>
+	
+	<bean id="emailTemplateSvc" class="com.md.studio.service.impl.EmailTemplateSvcImpl">
+		<property name="emailTemplateDao" ref="emailTemplateDao"/>
+	</bean>
+	
+	<bean id="siteUserInviteSvc" class="com.md.studio.service.impl.SiteUserInviteSvcImpl">
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+		<property name="invitesDao" ref="invitesDao"/>
+		<property name="templateName" value="${mdsnapshots.invite.user.templateName:invites.vm}"/>		
+		<property name="url" value="${mdsnapshots.invite.user.url:http://mdsnapshots.com/signup.html}"/>	
+	</bean>
+	
+	<bean id="referenceDataSvc" class="com.md.studio.service.impl.ReferenceDataSvcImpl">
+		<property name="referenceDataDao" ref="referenceDataDao"/>
+	</bean>
+	
+	
+	<bean id="adminNotificationSvc"	class="com.md.studio.service.impl.AdminNotificationSvcImpl">
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+		<property name="contactNotificationSmsTemplate" value="${mdsnapshots.adminNotificationSvc.contactSms:contact-sms.vm}"/>
+	</bean>
+	
+	<bean id="eventRequestSvc"	class="com.md.studio.service.impl.EventRequestSvcImpl">
+		<property name="eventRequestDao" ref="eventRequestDao"/>
+		<property name="emailSenderSvc" ref="emailSenderSvc"/>
+		<property name="infoEmailAddress" value="${md.studio.event.requestsvc.info.emailaddress:info@mdsnapshots.com}"/>
+	</bean>
+
+	<bean id="eventInfoSvc" class="com.md.studio.service.impl.EventInfoSvcImpl">
+		<property name="eventInfoDao" ref="eventInfoDao"/>
+	</bean>
+	
+	<bean id="emailMessage" class="com.md.studio.domain.EmailMessage">
+	</bean>
+	
+	<bean id="photoGathererSvc"	 class="com.md.studio.service.impl.PhotoGathererSvcImpl">
+		<property name="photoGathererDao" ref="photoGathererDao"/>
+		<property name="slash" value="${md.studio.photogatherersvc.slash:/}"/>
+		
+		<property name="mapOfDirectory">
+			<map>
+				<entry key="0" value="${mdstudio.photoInfoSvc.permPhotoLocation:/servers/mdstudio/mdStudio-Permanent_PhotoLocation}"/>
+				<entry key="4" value="${mdstudio.photoUtilSvc.permCalendarPhotoLocation:/Users/rordinario/Pictures/mdcalendarfolder}"/>
+			</map>
+		</property>
+	</bean>
+	
+	
+	<!-- VALIDATORS -->
+	<bean id="validationUtil" class="com.md.studio.utils.ValidationUtil"/>
+	<bean id="emailValidationUtil" class="com.md.studio.utils.EmailValidationUtil"/>
+	<bean id="eventRequestValidatorUtil" class="com.md.studio.utils.EventRequestValidator"/>
+
+	
+	<!-- UTILITY -->
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mdsnapshots.email.host:mail.shaw.ca}"/>
+		<property name="port" value="${mdsnapshots.email.port:587}"/> 
+		<property name="username" value="${mdsnapshots.email.username:ranord}"/>
+		<property name="password" value="${mdsnapshots.email.password:secret}"/>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.host">mail.shaw.ca</prop>
+				<prop key="mail.smtp.socketFactory.port">587</prop>
+				<prop key="mail.smtp.port">587</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="mailInternalMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="mdsnapshots.com"/>
+		<property name="port" value="25"/> 
+		<property name="username" value="support"/>
+		<property name="password" value="mdsupport"/>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.host">mdsnapshots.com</prop>
+				<prop key="mail.smtp.socketFactory.port">25</prop>
+				<prop key="mail.smtp.port">25</prop>
+			</props>
+		</property> 
+	</bean>
+	
+	<bean id="mailJetSenderSvc" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${mdsnapshots.emailjet.host:in.mailjet.com}"/>
+		<property name="port" value="${mdsnapshots.emailjet.port:465}"/>
+		<property name="username" value="${mdsnapshots.emailjet.username:test}"/>
+		<property name="password" value="${mdsnapshots.emailjet.password:secret}"/>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.host">in.mailjet.com</prop>
+				<prop key="mail.smtp.socketFactory.port">465</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.smtp.port">465</prop>
+			</props>
+		</property>
+	</bean> 
+	
+	<bean id="jmsMessageSender" class="com.md.studio.utils.JmsMessageSender">
+		<property name="queueJmsTemplate" >
+			<bean class="org.springframework.jms.core.JmsTemplate">
+				<property name="connectionFactory" ref="jmsConnectionFactory"/>
+				<property name="pubSubDomain" value="false"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="passwordValidationUtil" class="com.md.studio.utils.PasswordValidationUtil">
+	</bean>
+	
+	<bean id="whoIsApiUtil" class="com.md.studio.utils.WhoIsApiUtil">
+		<property name="domainAttrib" value="${whoisutil.domain.attrib:domainName}"/>
+		<property name="outputformatAttrib" value="${whoisutil.outputformat.attrib:outputFormat}"/>
+		<property name="passwordAttrib" value="${whoisutil.password.attrib:password}"/>
+		<property name="usernameAttrib" value="${whoisutil.username.attrib:username}"/>
+		
+		<property name="uri" value="${whoisutil.uri:https://www.whoisxmlapi.com/whoisserver/WhoisService}"/>
+		<property name="username" value="${whoisutil.username:mondhie}"/>
+		<property name="password" value="${whoisutil.password:mdsnapshots}"/>
+		<property name="outputFormat" value="${whoisutil.outputformat:JSON}"/>
+		
+		<property name="client">
+			<bean class="org.apache.commons.httpclient.HttpClient">
+				<property name="httpConnectionManager">
+					<bean class="org.apache.commons.httpclient.MultiThreadedHttpConnectionManager">
+						<property name="params">
+							<bean class="org.apache.commons.httpclient.params.HttpConnectionManagerParams">
+								<property name="maxTotalConnections" value="${mdsnapshots.whois.api.util.http.maxTotalConnections:20}"/>
+								<property name="defaultMaxConnectionsPerHost" value="${mdsnapshots.whois.api.util.http.maxConnectionsPerHost:1}"/>
+								<property name="soTimeout" value="${mdsnapshots.whois.api.util.http.soTimeout:150000}"/>
+								<property name="connectionTimeout" value="${mdsnapshots.whois.api.util.http.connectionTimeout:30000}"/>
+							</bean>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="siteUserActivityLogSvc" class="com.md.studio.service.impl.SiteUserActivityLogSvcImpl">
+		<property name="jmsMessageSender" ref="jmsMessageSender"/>
+		<property name="siteUserActivityLogDao" ref="siteUserActivityLogDao"/>
+		<property name="photoGathererSvc" ref="photoGathererSvc"/>
+		<property name="destionationQueueProcessLog" value="${mdsnapshots.processlog.destinationlog:processLog}"/>
+		<property name="whoIsApiUtil" ref="whoIsApiUtil"/>
+	</bean>
+	<!-- <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+  		<property name="corePoolSize" value="${mdstudio.taskExecutor.corePoolSize:5}"/>
+  		<property name="maxPoolSize" value="${mdstudio.taskExecutor.maxPoolSize:10}"/>
+  		<property name="queueCapacity" value="${mdstudio.taskExecutor.queueCapacity:50}"/>
+	</bean>
+
+	<task:annotation-driven executor="taskExecutor"/> -->	
+	
+</beans>

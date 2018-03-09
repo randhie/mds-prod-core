@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="EmailLog">
+	<typeAlias alias="EmailLog" type="com.md.studio.domain.EmailLog"/>
+	
+	<resultMap class="EmailLog" id="emaillog_rmap">
+		<result property="emailLogId"	column="EMAIL_LOG_ID"/>
+		<result property="fromEmail"	column="FROM_EMAIL"/>
+		<result property="fromName"		column="FROM_NAME"/>
+		<result property="toEmail"		column="TO_EMAIL"/>
+		<result property="toName"		column="TO_NAME"/>
+		<result property="emailSubject"	column="EMAIL_SUBJECT"/>
+		<result property="emailMessage" column="EMAIL_MESSAGE"/>
+		<result property="dateSent"		column="DATE_SENT"/>
+		<result property="withAttachments" column="WITH_ATTACHMENTS"/>
+	</resultMap>
+	
+	<sql id="emaillog_columns">
+		EMAIL_LOG_ID, FROM_EMAIL, FROM_NAME, TO_EMAIL, TO_NAME,
+		EMAIL_SUBJECT, EMAIL_MESSAGE, DATE_SENT, WITH_ATTACHMENTS
+	</sql>
+	
+	<insert id="insert" parameterClass="EmailLog" >
+		<selectKey keyProperty="emailLogId" type="pre" resultClass="Long" >
+			SELECT NEXTVAL('SEQ_EMAIL_LOG_ID')
+		</selectKey>
+	
+		INSERT INTO EMAIL_LOG (
+			<include refid="emaillog_columns"/>
+		)
+		VALUES (
+			#emailLogId#, #fromEmail#, #fromName#, 
+			#toEmail#, #toName#, #emailSubject#, 
+			#emailMessage#, #dateSent#, 
+			#withAttachments#
+		) 
+	</insert>
+	
+	
+</sqlMap>

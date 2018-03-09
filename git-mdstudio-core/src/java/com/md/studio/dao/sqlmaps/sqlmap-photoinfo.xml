@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="PhotoInfo">
+	<typeAlias alias="PhotoGatherer" type="com.md.studio.domain.PhotoGatherer"/>
+	<typeAlias alias="PhotoInfo" type="com.md.studio.domain.PhotoInfo"/>
+	
+	<resultMap class="PhotoGatherer" id="rmap_photogatherer" groupBy="categoryId" >
+		<result property="categoryId"  column="CATEGORY_ID"/>
+		<result property="category"		column="CATEGORY"/>
+		<result property="directory"	column="DIRECTORY"/>
+		<result property="dateCreated"	column="DATE_CREATED"/>
+		<result property="albumDescription"	column="ALBUM_DESCRIPTION"/>
+		<result property="albumCaptionName"	column="ALBUM_CAPTION_NAME"/>
+		<result property="categoryType"		column="CATEGORY_TYPE"/>
+		<result property="photoInfoList" resultMap="PhotoInfo.rmap_photoinfo" />
+	</resultMap>
+	
+	<resultMap class="PhotoInfo" id="rmap_photoinfo" groupBy="categoryId, photoId">
+		<result property="categoryId"	column="CATEGORY_ID"/>
+		<result property="photoId"		column="PHOTO_ID" nullValue="0"/>
+		<result property="fileName"		column="FILE_NAME"/>
+		<result property="photoType"	column="PHOTO_TYPE" nullValue="0"/>
+	</resultMap>
+	
+	<resultMap class="PhotoInfo" id="rmap_photoinfo2" >
+		<result property="categoryId"		column="CATEGORY_ID"/>
+		<result property="photoId"			column="PHOTO_ID" nullValue="0"/>
+		<result property="fileName"			column="FILE_NAME"/>
+		<result property="photoType"		column="PHOTO_TYPE" nullValue="0"/>
+		<result property="fileBytes"		column="FILE_BYTE" jdbcType="BINARY"/>
+		<result property="thumbnailBytes"	column="THUMBNAIL_BYTE" jdbcType="BINARY"/>
+	</resultMap>
+	
+	<sql id="photoinfo_columns">
+		PHOTO_ID, CATEGORY_ID, FILE_NAME, PHOTO_TYPE, FILE_BYTE, THUMBNAIL_BYTE
+	</sql>
+	
+	<sql id="photogatherer_columns">
+		CATEGORY_ID, CATEGORY, DIRECTORY, DATE_CREATED, 
+		ALBUM_DESCRIPTION, ALBUM_CAPTION_NAME, CATEGORY_TYPE
+	</sql>
+	
+	<sql id="photogatherer_join_columns">
+		g.CATEGORY_ID, g.CATEGORY, g.DIRECTORY, g.DATE_CREATED, 
+		g.ALBUM_DESCRIPTION, g.ALBUM_CAPTION_NAME, g.CATEGORY_TYPE,
+		p.PHOTO_ID, p.CATEGORY_ID, p.FILE_NAME, p.PHOTO_TYPE
+	</sql>
+	
+	<insert id="insert" parameterClass="photoGatherer">
+		<selectKey type="pre" keyProperty="categoryId" resultClass="long">
+			SELECT NEXTVAL('SEQ_PHOTO_GATHERER_ID')
+		</selectKey>
+		
+		INSERT INTO PHOTO_GATHERER (
+			<include refid="photogatherer_columns"/>
+		)
+		VALUES (
+			#categoryId#, #category#, #directory#, #dateCreated#,
+			#albumDescription#, #albumCaptionName#, #categoryType#
+		)
+	</insert>
+	
+	<insert id="insertPhoto" parameterClass="photoInfo">
+		<selectKey type="pre" keyProperty="photoId" resultClass="long">
+			SELECT NEXTVAL('SEQ_PHOTO_ID')
+		</selectKey>
+		
+		INSERT INTO PHOTO_INFO (
+			<include refid="photoinfo_columns"/>
+		)
+		VALUES (
+			#photoId#, #categoryId#, #fileName#, #photoType#, #fileBytes#, #thumbnailBytes#
+		)
+	</insert>
+	
+	
+	<update id="updatePhotoInfo" parameterClass="PhotoInfo">
+		UPDATE PHOTO_INFO
+		SET 
+			CATEGORY_ID = #categoryId#,
+			FILE_NAME = #fileName#,
+			PHOTO_TYPE = #photoType#,
+			FILE_BYTE = #fileBytes#,
+			THUMBNAIL_BYTE = #thumbnailBytes#
+		WHERE 
+			PHOTO_ID = #photoId#
+	</update>
+	
+	<update id="updateGatherer" parameterClass="PhotoGatherer">
+		UPDATE PHOTO_GATHERER
+		SET 
+			CATEGORY = #category#,
+			DIRECTORY = #directory#,
+			DATE_CREATED = #dateCreated#,
+			ALBUM_DESCRIPTION = #albumDescription#,
+			ALBUM_CAPTION_NAME = #albumCaptionName#,
+			CATEGORY_TYPE = #categoryType#
+		WHERE CATEGORY_ID = #categoryId#
+	</update>
+	
+	<delete id="deleteCategory" parameterClass="PhotoGatherer">
+		DELETE FROM PHOTO_GATHERER
+		WHERE CATEGORY_ID = #categoryId#
+	</delete>
+	
+	<delete id="deletePhotoInfo" parameterClass="PhotoInfo">
+		DELETE FROM PHOTO_INFO
+		WHERE PHOTO_ID = #photoId#
+	</delete>
+	
+	<delete id="deletePhotoByCategoryId" parameterClass="long">
+		DELETE FROM PHOTO_INFO
+		WHERE CATEGORY_ID = #value#
+	</delete>
+	
+	<delete id="deleteByCategoryType" parameterClass="Integer">
+		DELETE FROM PHOTO_GATHERER
+		WHERE CATEGORY_TYPE = #value#
+	</delete>
+	
+	<select id="selectAll" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+	</select>
+	
+	<select id="selectAllCategory" parameterClass="Integer" resultClass="String">
+		SELECT DISTINCT(CATEGORY)
+		FROM PHOTO_GATHERER
+		WHERE CATEGORY_TYPE = #value#
+		ORDER BY CATEGORY ASC
+	</select>
+
+	<select id="selectAllByCategory" parameterClass="String" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY_ID = #value#
+		ORDER BY g.DATE_CREATED ASC
+	</select>
+
+	<select id="selectAllCoversByCategory" parameterClass="String" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY= #value#
+		AND (p.PHOTO_TYPE = 2 OR p.PHOTO_TYPE = 3) 
+		ORDER BY g.DATE_CREATED DESC
+	</select>
+	
+	<select id="selectPhotosByAlbum" parameterClass="map" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		LEFT OUTER JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY = #category#
+		and g.DIRECTORY = #directory#
+		and p.PHOTO_TYPE <![CDATA[ <> ]]> 3
+		LIMIT '$limit$'
+		OFFSET '$offset$'
+	</select>
+	
+	
+	<select id="selectPhoto" parameterClass="map" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY = #category#
+		and g.DIRECTORY = #directory#	
+		and p.FILE_NAME = #fileName#
+	</select>
+	
+	<select id="selectByPhotoId" parameterClass="long" resultMap="rmap_photoinfo2">
+		SELECT
+			<include refid="photoinfo_columns"/>
+		FROM PHOTO_INFO
+		WHERE PHOTO_ID = #value#
+	</select>
+	
+	<select id="selectByPhotoIdByte" parameterClass="long" resultClass="byte">
+		SELECT
+			FILE_BYTE
+		FROM PHOTO_INFO
+		WHERE PHOTO_ID = #value#
+	</select>
+	
+	<select id="selectCategoryId" parameterClass="long" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		LEFT OUTER JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY_ID = #value#
+	</select>
+	
+	<select id="selectPhotoByCategoryIdAndFileName" parameterClass="map" resultMap="rmap_photoinfo">
+		SELECT
+			<include refid="photoinfo_columns"/>
+		FROM PHOTO_INFO
+		WHERE CATEGORY_ID = #categoryId#
+		AND FILE_NAME = #fileName#
+	</select>
+	
+	<select id="selectAllByCategoryType" parameterClass="Integer" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		LEFT OUTER JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY_TYPE = #value#
+		ORDER BY g.DATE_CREATED DESC, g.CATEGORY ASC
+	</select>
+	
+	<select id="selectByCategoryType" parameterClass="map" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY_TYPE = #categoryType#
+		<isNotNull property="category">
+			AND g.CATEGORY = #category#
+		</isNotNull>
+		AND p.PHOTO_TYPE IN 
+			<iterate open="(" close=")" property="photoType" conjunction=",">
+				#photoType[]#
+			</iterate>
+		ORDER BY g.CATEGORY ASC, g.DATE_CREATED DESC
+	</select>
+	
+	
+	<select id="selectIdByCategoryType" parameterClass="map" resultMap="rmap_photogatherer">
+		SELECT 
+			<include refid="photogatherer_join_columns"/>
+		FROM PHOTO_GATHERER g 
+		JOIN PHOTO_INFO p 
+		ON (g.CATEGORY_ID = p.CATEGORY_ID)
+		WHERE g.CATEGORY_ID = #categoryId#
+		AND p.PHOTO_TYPE IN 
+			<iterate open="(" close=")" property="photoType" conjunction=",">
+				#photoType[]#
+			</iterate>
+		ORDER BY g.CATEGORY ASC, g.DATE_CREATED DESC
+	</select>
+	
+	
+</sqlMap>

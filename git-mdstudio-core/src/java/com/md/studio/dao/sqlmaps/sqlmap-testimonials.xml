@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" 
+"http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Testimonials">
+	<typeAlias alias="Testimonials" type="com.md.studio.domain.Testimonials"/>
+	<typeAlias alias="SiteUserRate" type="com.md.studio.domain.SiteUserRate"/>
+	
+	<resultMap class="Testimonials" id="rmap_testimonials">
+		<result property="testimonialId"		column="TESTIMONIAL_ID"/>
+		<result property="emailAddress"			column="EMAIL_ADDRESS"/>
+		<result property="firstName"			column="FIRST_NAME"/>
+		<result property="lastName"				column="LAST_NAME"/>
+		<result property="message"				column="MESSAGE"/>
+		<result property="socialMediaAcct"		column="SOCIAL_MEDIA_ACCT"/>
+		<result property="urlAddress"			column="URL_ADDRESS"/>
+		<result property="browserInfo"			column="BROWSER_INFO"/>
+		<result property="dateCreated"			column="DATE_CREATED"/>
+		<result property="ipAddress"			column="IP_ADDRESS"/>
+		<result property="updateDate"			column="UPDATE_DATE"/>
+		<result property="rate"					column="RATE"/>
+	</resultMap>
+	
+	<resultMap class="SiteUserRate" id="rmap_siteuserrate">
+		<result property="rate"					column="RATE"/>
+		<result property="count"				column="COUNT"/>		
+	</resultMap>
+	
+	<sql id="testimonial_columns">
+		TESTIMONIAL_ID, EMAIL_ADDRESS, FIRST_NAME, LAST_NAME,
+		MESSAGE, SOCIAL_MEDIA_ACCT, URL_ADDRESS, BROWSER_INFO,
+		DATE_CREATED, IP_ADDRESS, UPDATE_DATE, RATE
+	</sql>
+	
+	<insert id="insert" parameterClass="Testimonials">
+		<selectKey type="pre" keyProperty="testimonialId" resultClass="long">
+			SELECT NEXTVAL('SEQ_TESTIMONIALS')
+		</selectKey>
+	
+		INSERT INTO TESTIMONIALS (
+			<include refid="testimonial_columns"/>
+		)
+		VALUES(
+			#testimonialId#, #emailAddress#, #firstName#, #lastName#, 
+			#message#, #socialMediaAcct#, #urlAddress#, #browserInfo#, 
+			#dateCreated#, #ipAddress#, #updateDate#, #rate#
+		)
+	</insert>	
+	
+	<update id="update" parameterClass="Testimonials">
+		UPDATE TESTIMONIALS
+		SET	
+			EMAIL_ADDRESS = #emailAddress#,
+			FIRST_NAME = #firstName#,
+			LAST_NAME = #lastName#,
+			MESSAGE = #message#,
+			SOCIAL_MEDIA_ACCT = #socialMediaAcct#,
+			URL_ADDRESS = #urlAddress#,
+			UPDATE_DATE = #updateDate#
+		WHERE TESTIMONIAL_ID = #testimonialId#
+	</update>
+	
+	
+	
+	<!-- DELETE -->
+	<delete id="deleteById" parameterClass="String">
+		DELETE FROM TESTIMONIALS
+		WHERE TESTIMONIAL_ID = #value#
+	</delete>
+	
+	<delete id="deleteByEmail" parameterClass="String">
+		DELETE FROM TESTIMONIALS
+		WHERE EMAIL_ADDRESS = #value#
+	</delete>
+	
+	
+	<!-- SELECT -->	
+	<select id="selectAllByFilter" parameterClass="Map" resultMap="rmap_testimonials">
+		SELECT 
+			<include refid="testimonial_columns"/>
+		FROM TESTIMONIALS
+		ORDER BY DATE_CREATED DESC
+		LIMIT #limit#
+		OFFSET #offset#
+	</select>
+	
+	<select id="selectById" parameterClass="long" resultMap="rmap_testimonials">
+		SELECT
+			<include refid="testimonial_columns"/>
+		FROM TESTIMONIALS
+		WHERE TESTIMONIAL_ID = #value#
+	</select>
+	
+	<select id="selectByEmail" parameterClass="String" resultMap="rmap_testimonials">
+		SELECT
+			<include refid="testimonial_columns"/>
+		FROM TESTIMONIALS
+		WHERE EMAIL_ADDRESS = #value#
+	</select>
+	
+	<select id="selectCountAll" resultMap="rmap_siteuserrate">
+		SELECT DISTINCT RATE, COUNT(*)
+		FROM TESTIMONIAL
+		GROUP BY RATE
+	</select>
+</sqlMap>
